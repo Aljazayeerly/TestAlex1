@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>chat ya gd3</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script>
+            var requset1;
+            var requset2;
+            function sendMessage()
+            {
+                if (window.XMLHttpRequest) {
+                    requset1 = new XMLHttpRequest();
+                    //requset1.onreadystatechange = handleRequest1;
+                    var name = document.getElementById("nme").value;
+                    var message = document.getElementById("msg").value;
+                    query = "?username=" + name + "&" + "message=" + message;
+                    requset1.open('Get', 'http://localhost:8084/Ajax/ChatServlet' + query, true);
+                    requset1.send(null);
+
+
+                }
+            }
+            function handleRequest() {
+                if (requset2.readyState === 4)
+                {
+                    
+                    var xmlDoc = requset2.responseXML;
+                    var messages = xmlDoc.getElementsByTagName("msg");
+                    var currrntMessage=messages[0];
+                    var messages_div = document.getElementById("messages");
+                    
+                    for (i = 0; i < messages.length; i++) {
+                       var currrntMessage=messages[i];
+                       var msgDiv=document.createElement("div");
+                       var name=document.createTextNode(currrntMessage.childNodes[0].childNodes[0].nodeValue);
+                       var text=document.createTextNode(currrntMessage.childNodes[1].childNodes[0].nodeValue);
+                       var date=document.createTextNode(currrntMessage.childNodes[2].childNodes[0].nodeValue);
+                       var id=document.createTextNode(currrntMessage.childNodes[3].childNodes[0].nodeValue);
+                       msgDiv.appendChild(name);
+                       msgDiv.appendChild(text);
+                       msgDiv.appendChild(date);
+                       msgDiv.appendChild(id);
+                       messages_div.appendChild(msgDiv);
+                       
+                     
+                       //alert(currrntMessage.firstChild.nodeValue);
+                      //alert( currrntMessage.childNodes[0].childNodes[0].nodeValue);
+                       //alert("i am here");
+                       //msgDiv.appendChild(text);
+                       //msgDiv.appendChild(date);
+                       //msgDiv.appendChild(id);
+
+                    }
+                }
+
+            }
+
+            function getMessages() {
+               // alert("get message");
+                requset2 = new XMLHttpRequest();
+                requset2.onreadystatechange = handleRequest;
+                requset2.open('POST', 'http://localhost:8084/Ajax/ChatServlet', true);
+                requset2.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;");
+                requset2.send(new Date().getTime());
+
+            }
+        </script>
+    </head>
+    <body onload="setInterval('getMessages()', 5000)">
+        Name:<input type="text" name="username"  id="nme"/><br/>
+        Message:<input type="text" name="message" id="msg" /><br/>
+        <input type="button" value="Send" name="btn" onclick="sendMessage()" />
+
+        <div id="messages"></div>
+    </body>
+</html>
